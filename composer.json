@@ -9,5 +9,8 @@
 	"require": {
 		"php": ">=5",
 		"ext-curl": "*"
+	},
+	"autoload": {
+		"psr-4": {"Phyrexia\\Http\\": ""}
 	}
 }
