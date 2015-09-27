@@ -5,14 +5,12 @@
  * @author Jérémy 'Jejem' Desvages <jejem@phyrexia.org>
  * @copyright Jérémy 'Jejem' Desvages
  * @license The MIT License (MIT)
- * @version 1.0.0
+ * @version 1.1.0
 **/
 
 namespace Phyrexia\Http;
 
 class Request {
-	public $alertEmails = array();
-
 	private $url = NULL;
 	private $method = 'GET';
 
@@ -31,8 +29,8 @@ class Request {
 	private $responseError = NULL;
 
 	private $maxRequests = 5;
-	private $connectTimeout = 10;
-	private $requestTimeout = 30;
+	private $connectTimeout = 5;
+	private $requestTimeout = 10;
 
 	public function __construct($url=NULL, $method='GET', $options=array()) {
 		$this->setUrl($url);
@@ -206,12 +204,8 @@ class Request {
 			$this->responseBody = curl_exec($ch);
 			$i++;
 
-			if ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i > $this->maxRequests) {
-				if (is_array($this->alertEmails) && count($this->alertEmails) > 0) {
-					foreach ($this->alertEmails as $alertEmail)
-						mail($alertEmail, '[HttpRequest] Request failed after '.$this->maxRequests.' attempts', 'Request failed after '.$this->maxRequests.' attempts:'."\n\n".'Referer: '.$_SERVER['HTTP_REFERER']."\n".'URL: '.$this->url."\n".'PostFields: '.$this->postFields."\n\n".'Errno: '.curl_errno($ch)."\n".'Error: '.curl_error($ch)."\n\n".'Debug: '.print_r(debug_backtrace(), true), 'X-Mailer: PHP/'.phpversion());
-				}
-			}
+			if ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i > $this->maxRequests)
+				throw new \Exception(curl_error($ch), curl_errno($ch));
 		}
 
 		$this->responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
