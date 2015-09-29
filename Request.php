@@ -193,10 +193,7 @@ class Request {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
 
 		$ret = curl_exec($ch);
-
-		$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-		$this->responseHeader = trim(substr($ret, 0, $headerSize));
-		$this->responseBody = substr($ret, $headerSize);
+		list($this->responseHeader, $this->responseBody) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
 
 		$i = 1;
 		while ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i < $this->maxRequests) {
