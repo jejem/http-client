@@ -182,7 +182,7 @@ class Request {
 				curl_setopt($ch, CURLOPT_POST, 1);
 				if (! is_null($this->postFields))
 					curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postFields);
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: close', 'Content-Type: '.$this->contentType));
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:', 'Connection: close', 'Content-Type: '.$this->contentType));
 				break;
 		}
 		curl_setopt($ch, CURLOPT_HEADER, 1);
