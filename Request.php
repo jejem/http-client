@@ -5,7 +5,7 @@
  * @author Jérémy 'Jejem' Desvages <jejem@phyrexia.org>
  * @copyright Jérémy 'Jejem' Desvages
  * @license The MIT License (MIT)
- * @version 1.1.0
+ * @version 1.1.1
 **/
 
 namespace Phyrexia\Http;
