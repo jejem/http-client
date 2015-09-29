@@ -175,10 +175,10 @@ class Request {
 				curl_setopt($ch, CURLOPT_NOBODY, 1);
 				break;
 			case 'GET':
+			default:
 				curl_setopt($ch, CURLOPT_HTTPGET, 1);
 				break;
 			case 'POST':
-			default:
 				curl_setopt($ch, CURLOPT_POST, 1);
 				if (! is_null($this->postFields))
 					curl_setopt($ch, CURLOPT_POSTFIELDS, $this->postFields);
