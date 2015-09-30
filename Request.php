@@ -203,8 +203,14 @@ class Request {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
 
 		$ret = curl_exec($ch);
-		$this->requestHeader = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-		list($this->responseHeader, $this->responseBody) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
+		$this->requestHeader = trim(curl_getinfo($ch, CURLINFO_HEADER_OUT));
+
+		$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		if (is_numeric($headerSize) && $headerSize > 0) {
+			$this->responseHeader = trim(substr($ret, 0, $headerSize));
+			$this->responseBody = substr($ret, $headerSize);
+		} else
+			list($this->responseHeader, $this->responseBody) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
 
 		$i = 1;
 		while ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i < $this->maxRequests) {
