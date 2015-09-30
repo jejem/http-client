@@ -22,6 +22,7 @@ class Request {
 
 	private $responseCode = 0;
 	private $responseContentType = NULL;
+	private $requestHeader = NULL;
 	private $responseHeader = NULL;
 	private $responseBody = NULL;
 
@@ -150,6 +151,10 @@ class Request {
 		return $this->responseContentType;
 	}
 
+	public function getRequestHeader() {
+		return $this->requestHeader;
+	}
+
 	public function getResponseHeader() {
 		return $this->responseHeader;
 	}
@@ -189,6 +194,7 @@ class Request {
 				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:', 'Connection: close', 'Content-Type: '.$this->contentType));
 				break;
 		}
+		curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -197,6 +203,7 @@ class Request {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
 
 		$ret = curl_exec($ch);
+		$this->requestHeader = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 		list($this->responseHeader, $this->responseBody) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
 
 		$i = 1;
