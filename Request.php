@@ -40,6 +40,10 @@ class Request {
 			$this->$k = $v;
 	}
 
+	public function __toString() {
+		return print_r($this, true);
+	}
+
 	private function reset() {
 		$this->contentType = 'application/x-www-form-urlencoded';
 		$this->userAgent = NULL;
