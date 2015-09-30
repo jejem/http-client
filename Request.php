@@ -23,6 +23,8 @@ class Request {
 	private $responseCode = 0;
 	private $responseContentType = NULL;
 	private $requestHeader = NULL;
+	private $responseFull = NULL;
+	private $responseHeaderSize = NULL;
 	private $responseHeader = NULL;
 	private $responseBody = NULL;
 
@@ -155,6 +157,14 @@ class Request {
 		return $this->requestHeader;
 	}
 
+	public function getResponseFull() {
+		return $this->responseFull;
+	}
+
+	public function getResponseHeaderSize() {
+		return $this->responseHeaderSize;
+	}
+
 	public function getResponseHeader() {
 		return $this->responseHeader;
 	}
@@ -203,19 +213,13 @@ class Request {
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->requestTimeout);
 
 		$ret = curl_exec($ch);
-		$this->requestHeader = trim(curl_getinfo($ch, CURLINFO_HEADER_OUT));
-
-		$headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-		if (is_numeric($headerSize) && $headerSize > 0) {
-			$this->responseHeader = trim(substr($ret, 0, $headerSize));
-			$this->responseBody = substr($ret, $headerSize);
-		} else
-			list($this->responseHeader, $this->responseBody) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
+		$this->parseOutput($ch, $ret);
 
 		$i = 1;
 		while ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i < $this->maxRequests) {
 			usleep(rand(1000000, 3000000));
-			$this->responseBody = curl_exec($ch);
+			$ret = curl_exec($ch);
+			$this->parseOutput($ch, $ret);
 			$i++;
 
 			if ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i > $this->maxRequests)
@@ -241,5 +245,22 @@ class Request {
 			return true;
 
 		return $this->responseBody;
+	}
+
+	private function parseOutput(&$ch, $ret) {
+		if (! $ret)
+			return false;
+
+		$this->requestHeader = trim(curl_getinfo($ch, CURLINFO_HEADER_OUT));
+
+		$this->responseFull = $ret;
+		$this->responseHeaderSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		if (is_numeric($this->responseHeaderSize) && $this->responseHeaderSize > 0) {
+			$this->responseHeader = trim(substr($ret, 0, $this->responseHeaderSize));
+			$this->responseBody = substr($ret, $this->responseHeaderSize);
+		} else
+			list($this->responseHeader, $this->responseBody) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
+
+		return true;
 	}
 }
