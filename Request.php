@@ -11,31 +11,31 @@
 namespace Phyrexia\Http;
 
 class Request {
-	private $url = NULL;
+	private $url;
 	private $method = 'GET';
 
 	private $contentType = 'application/x-www-form-urlencoded';
-	private $userAgent = NULL;
-	private $postFields = NULL;
-	private $httpCredentials = NULL;
+	private $userAgent;
+	private $postFields;
+	private $httpCredentials;
 	private $followRedirects = true;
 
-	private $responseCode = 0;
-	private $responseContentType = NULL;
-	private $requestHeader = NULL;
-	private $responseFull = NULL;
-	private $responseHeaderSize = NULL;
-	private $responseHeader = NULL;
-	private $responseBody = NULL;
+	private $responseCode;
+	private $responseContentType;
+	private $requestHeader;
+	private $responseFull;
+	private $responseHeaderSize;
+	private $responseHeader;
+	private $responseBody;
 
-	private $responseErrno = 0;
-	private $responseError = NULL;
+	private $responseErrno;
+	private $responseError;
 
 	private $maxRequests = 5;
 	private $connectTimeout = 5;
 	private $requestTimeout = 10;
 
-	public function __construct($url=NULL, $method='GET', $options=array()) {
+	public function __construct($url = NULL, $method = 'GET', array $options = array()) {
 		$this->setUrl($url);
 		$this->setMethod($method);
 
@@ -127,6 +127,15 @@ class Request {
 		return true;
 	}
 
+	public function setMaxRequests($maxRequests) {
+		if (! is_numeric($maxRequests))
+			return false;
+
+		$this->maxRequests = (int)$maxRequests;
+
+		return true;
+	}
+
 	public function setConnectTimeout($connectTimeout) {
 		if (! is_numeric($connectTimeout))
 			return false;
@@ -182,12 +191,15 @@ class Request {
 	}
 
 	public function send() {
+		if (is_null($this->url))
+			return false;
+
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_URL, $this->url);
-		if (is_string($this->userAgent) && strlen($this->userAgent) > 0)
+		if (! is_null($this->userAgent))
 			curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-		if (is_string($this->httpCredentials) && strlen($this->httpCredentials) > 0)
+		if (! is_null($this->httpCredentials))
 			curl_setopt($ch, CURLOPT_USERPWD, $this->httpCredentials);
 		switch ($this->method) {
 			case 'HEAD':
