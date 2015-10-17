@@ -233,9 +233,6 @@ class Request {
 			$ret = curl_exec($ch);
 			$this->parseOutput($ch, $ret);
 			$i++;
-
-			if ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i > $this->maxRequests)
-				throw new \Exception(curl_error($ch), curl_errno($ch));
 		}
 
 		$this->responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -244,7 +241,7 @@ class Request {
 		$this->responseErrno = curl_errno($ch);
 		$this->responseError = curl_error($ch);
 
-		if (in_array($this->getResponseCode(), array(301, 302)) && ! is_null($this->followRedirects) && $this->followRedirects === true) {
+		if (in_array($this->responseCode, array(301, 302)) && ! is_null($this->followRedirects) && $this->followRedirects === true) {
 			$this->setUrl(curl_getinfo($ch, CURLINFO_REDIRECT_URL));
 			return $this->send();
 		}
@@ -252,6 +249,9 @@ class Request {
 		curl_close($ch);
 
 		$this->reset();
+
+		if (! $ret || $this->responseErrno == CURLE_COULDNT_CONNECT || $this->responseErrno == CURLE_RECV_ERROR || $this->responseErrno == CURLE_OPERATION_TIMEOUTED || $this->responseErrno == CURLE_GOT_NOTHING)
+			throw new RequestException($this->responseError, $this->responseErrno);
 
 		if ($this->method == 'HEAD')
 			return true;
