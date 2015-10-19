@@ -11,6 +11,6 @@
 		"ext-curl": "*"
 	},
 	"autoload": {
-		"psr-4": {"Phyrexia\\Http\\": ""}
+		"psr-4": {"Phyrexia\\Http\\": "src/"}
 	}
 }
