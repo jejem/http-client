@@ -44,7 +44,10 @@ class Uri implements \Psr\Http\Message\UriInterface {
 
 		$buf = $parts['Scheme'];
 		if ($buf != '')
-			$ret .= $buf.'://';
+			$ret .= $buf.':';
+
+		if ($parts['UserInfo'] != '' || $parts['Host'] != '' || ! is_null($parts['Port']))
+			$ret .= '//';
 
 		$buf = $parts['UserInfo'];
 		if ($buf != '')
@@ -57,8 +60,15 @@ class Uri implements \Psr\Http\Message\UriInterface {
 			$ret .= ':'.$buf;
 
 		$buf = $parts['Path'];
-		if ($buf != '')
+		if ($buf != '') {
+			if (($parts['UserInfo'] != '' || $parts['Host'] != '' || ! is_null($parts['Port'])) && substr($buf, 0, 1) != '/') {
+				$buf = '/'.$buf;
+			} elseif (($parts['UserInfo'] == '' && $parts['Host'] == '' && is_null($parts['Port'])) && substr($buf, 0, 2) == '//') {
+				while (substr($buf, 0, 2) == '//')
+					$buf = substr($buf, 1);
+			}
 			$ret .= $buf;
+		}
 
 		$buf = $parts['Query'];
 		if ($buf != '')
