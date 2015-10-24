@@ -17,7 +17,6 @@ class Client {
 	private $contentType = 'application/x-www-form-urlencoded';
 	private $userAgent;
 	private $postFields;
-	private $httpCredentials;
 	private $followRedirects = true;
 
 	private $responseCode;
@@ -35,7 +34,7 @@ class Client {
 	private $connectTimeout = 5;
 	private $requestTimeout = 10;
 
-	public function __construct($url = NULL, $method = 'GET', array $options = array()) {
+	public function __construct(Uri $url, $method = 'GET', array $options = array()) {
 		$this->setUrl($url);
 		$this->setMethod($method);
 
@@ -51,15 +50,11 @@ class Client {
 		$this->contentType = 'application/x-www-form-urlencoded';
 		$this->userAgent = NULL;
 		$this->postFields = NULL;
-		$this->httpCredentials = NULL;
 		$this->followRedirects = true;
 	}
 
-	public function setUrl($url) {
-		if (! is_string($url))
-			return false;
-
-		if (! filter_var($url, FILTER_VALIDATE_URL))
+	public function setUrl(Uri $url) {
+		if (! filter_var($url->getUri(), FILTER_VALIDATE_URL))
 			return false;
 
 		$this->url = $url;
@@ -105,15 +100,6 @@ class Client {
 			return false;
 
 		$this->postFields = $postData;
-
-		return true;
-	}
-
-	public function setHttpCredentials($httpCredentials) {
-		if (! is_string($httpCredentials))
-			return false;
-
-		$this->httpCredentials = $httpCredentials;
 
 		return true;
 	}
@@ -191,16 +177,16 @@ class Client {
 	}
 
 	public function send() {
-		if (is_null($this->url))
+		if (! $this->url instanceof Uri)
 			return false;
 
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, $this->url);
+		curl_setopt($ch, CURLOPT_URL, $this->url->getUri());
 		if (! is_null($this->userAgent))
 			curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
-		if (! is_null($this->httpCredentials))
-			curl_setopt($ch, CURLOPT_USERPWD, $this->httpCredentials);
+		if ($this->url->getUserInfo() != '')
+			curl_setopt($ch, CURLOPT_USERPWD, $this->url->getUserInfo());
 		switch ($this->method) {
 			case 'HEAD':
 				curl_setopt($ch, CURLOPT_NOBODY, 1);
