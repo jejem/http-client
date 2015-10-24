@@ -33,7 +33,7 @@ class Uri implements \Psr\Http\Message\UriInterface {
 		);
 	}
 
-	public function buildUri($parts = array()) {
+	public function buildUri(array $parts = array()) {
 		$parts = array_merge($this->getUriParts(), $parts);
 
 		$ret = '';
