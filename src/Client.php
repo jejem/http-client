@@ -54,7 +54,7 @@ class Client {
 	}
 
 	public function setUrl(Uri $url) {
-		if (! filter_var($url->getUri(), FILTER_VALIDATE_URL))
+		if (! filter_var((string)$url, FILTER_VALIDATE_URL))
 			return false;
 
 		$this->url = $url;
@@ -182,7 +182,7 @@ class Client {
 
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, $this->url->getUri());
+		curl_setopt($ch, CURLOPT_URL, (string)$this->url);
 		if (! is_null($this->userAgent))
 			curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
 		if ($this->url->getUserInfo() != '')
