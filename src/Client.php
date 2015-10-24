@@ -1,6 +1,6 @@
 <?php
 /**
- * Http/Request.php
+ * Http/Client.php
  *
  * @author Jérémy 'Jejem' Desvages <jejem@phyrexia.org>
  * @copyright Jérémy 'Jejem' Desvages
@@ -10,7 +10,7 @@
 
 namespace Phyrexia\Http;
 
-class Request {
+class Client {
 	private $url;
 	private $method = 'GET';
 
@@ -251,7 +251,7 @@ class Request {
 		$this->reset();
 
 		if (! $ret || $this->responseErrno == CURLE_COULDNT_CONNECT || $this->responseErrno == CURLE_RECV_ERROR || $this->responseErrno == CURLE_OPERATION_TIMEOUTED || $this->responseErrno == CURLE_GOT_NOTHING)
-			throw new RequestException($this->responseError, $this->responseErrno);
+			throw new ClientException($this->responseError, $this->responseErrno);
 
 		if ($this->method == 'HEAD')
 			return true;

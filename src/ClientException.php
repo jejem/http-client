@@ -1,6 +1,6 @@
 <?php
 /**
- * Http/RequestException.php
+ * Http/ClientException.php
  *
  * @author Jérémy 'Jejem' Desvages <jejem@phyrexia.org>
  * @copyright Jérémy 'Jejem' Desvages
@@ -10,4 +10,4 @@
 
 namespace Phyrexia\Http;
 
-class RequestException extends \Exception {}
+class ClientException extends \Exception {}
