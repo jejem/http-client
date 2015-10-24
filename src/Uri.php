@@ -17,10 +17,6 @@ class Uri implements \Psr\Http\Message\UriInterface {
 		$this->uri = $uri;
 	}
 
-	public function __toString() {
-		return $this->getUri();
-	}
-
 	public function getUri() {
 		return $this->buildUri();
 	}
@@ -198,7 +194,7 @@ class Uri implements \Psr\Http\Message\UriInterface {
 		if (! is_string($host))
 			throw new \InvalidArgumentException('Invalid host '.$host);
 
-		return new Uri($this->buildUri(array('Host' => $host)));
+		return new Uri($this->buildUri(array('Host' => strtolower($host))));
 	}
 
 	public function withPort($port) {
@@ -227,5 +223,9 @@ class Uri implements \Psr\Http\Message\UriInterface {
 			throw new \InvalidArgumentException('Invalid fragment '.$fragment);
 
 		return new Uri($this->buildUri(array('Fragment' => $fragment)));
+	}
+
+	public function __toString() {
+		return $this->getUri();
 	}
 }
