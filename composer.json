@@ -5,7 +5,7 @@
 	"keywords": ["http", "client", "request", "response"],
 	"authors": [{"name": "Jérémy 'Jejem' Desvages", "email": "jejem@phyrexia.org"}],
 	"license": "MIT",
-	"version": "1.3.0",
+	"version": "2.0.0",
 	"require": {
 		"php": ">=5.3",
 		"ext-curl": "*",
