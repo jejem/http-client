@@ -23,6 +23,10 @@ class Client {
 
 	public function __construct($url = NULL, $method = 'GET', array $options = array()) {
 		if (! is_null($url)) {
+			$uri = new Uri($url);
+			if ($uri->getScheme() == '')
+				$url = 'http://'.$url;
+
 			$this->request = new Request($method, $url);
 			$this->request = $this->request->withHeader('Expect', '');
 			$this->request = $this->request->withHeader('Connection', 'close');
