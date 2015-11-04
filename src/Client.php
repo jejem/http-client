@@ -5,7 +5,7 @@
  * @author Jérémy 'Jejem' Desvages <jejem@phyrexia.org>
  * @copyright Jérémy 'Jejem' Desvages
  * @license The MIT License (MIT)
- * @version 2.1.0
+ * @version 2.1.1
 **/
 
 namespace Phyrexia\Http;
@@ -149,7 +149,7 @@ class Client {
 		$this->errno = curl_errno($ch);
 		$this->error = curl_error($ch);
 
-		if (substr($this->response->getStatusCode(), 0, 1) == 3 && $this->followRedirects) {
+		if (! is_null($this->response) && substr($this->response->getStatusCode(), 0, 1) == 3 && $this->followRedirects) {
 			$this->setUri(new Uri(curl_getinfo($ch, CURLINFO_REDIRECT_URL)));
 			return $this->send();
 		}
