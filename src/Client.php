@@ -19,7 +19,7 @@ class Client {
 	private $error;
 
 	private $followRedirects = true;
-	private $maxTries = 5;
+	private $maxTries = 3;
 
 	public function __construct($url = NULL, $method = 'GET', array $options = array()) {
 		if (! is_null($url)) {
