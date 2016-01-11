@@ -31,6 +31,13 @@ class Client {
 			$this->request = $this->request->withHeader('Expect', '');
 			$this->request = $this->request->withHeader('Connection', 'close');
 			$this->request = $this->request->withHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+
+			if (in_array(CURLOPT_HTTPHEADER, array_keys($options)) && is_array($options[CURLOPT_HTTPHEADER])) {
+				foreach ($options[CURLOPT_HTTPHEADER] as $header) {
+					$buf = explode(': ', $header, 2);
+					$this->request = $this->request->withHeader($buf[0], $buf[1]);
+				}
+			}
 		}
 
 		$this->options = $options;
