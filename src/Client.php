@@ -223,6 +223,7 @@ class Client {
 		if (! $body)
 			$body = '';
 
+		$raw_headers = $headers;
 		$header_lines = explode("\r\n", $headers);
 		$headers = array();
 		foreach ($header_lines as $header_line) {
@@ -234,6 +235,11 @@ class Client {
 		}
 
 		$this->response = new Response(curl_getinfo($ch, CURLINFO_HTTP_CODE), $headers, $body);
+
+		$this->response->setHeadersSize($headers_size);
+		$this->response->setRawHeaders($raw_headers);
+		$this->response->setRawBody($body);
+		$this->response->setRawOutput($ret);
 
 		return true;
 	}
