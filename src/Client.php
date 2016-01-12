@@ -214,6 +214,9 @@ class Client {
 		if (! is_resource($ch) || ! $ret)
 			return false;
 
+		if (array_key_exists(CURLOPT_PROXY, $this->options) && version_compare(curl_version()['version'], '7.30.0', '<'))
+			list($headers, $ret) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
+
 		$headers_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 		if (is_numeric($headers_size) && $headers_size > 0) {
 			$headers = trim(substr($ret, 0, $headers_size));
