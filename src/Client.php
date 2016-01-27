@@ -134,7 +134,9 @@ class Client {
 				break;
 			case 'POST':
 				curl_setopt($ch, CURLOPT_POST, 1);
-				if ((string)$this->request->getBody() != '')
+				if (array_key_exists(CURLOPT_POSTFIELDS, $this->options))
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $this->options[CURLOPT_POSTFIELDS]);
+				if (! array_key_exists(CURLOPT_POSTFIELDS, $this->options) && (string)$this->request->getBody() != '')
 					curl_setopt($ch, CURLOPT_POSTFIELDS, (string)$this->request->getBody());
 				break;
 		}
@@ -199,13 +201,12 @@ class Client {
 	}
 
 	public function setPostData($postData) {
-		if (is_array($postData) || is_object($postData))
-			$postData = http_build_query($postData);
+		$this->setMethod('POST');
 
-		if (is_string($postData)) {
-			$this->setMethod('POST');
+		if (is_array($postData))
+			$this->options[CURLOPT_POSTFIELDS] = $postData;
+		elseif (is_string($postData))
 			$this->request = $this->request->withBody(\GuzzleHttp\Psr7\stream_for($postData));
-		}
 
 		return true;
 	}
