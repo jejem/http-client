@@ -111,6 +111,9 @@ class Client {
 			$this->request = $request;
 
 		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_ENCODING, '');
+
 		curl_setopt_array($ch, $this->options);
 
 		curl_setopt($ch, CURLOPT_URL, (string)$this->request->getUri());
