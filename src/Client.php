@@ -19,6 +19,8 @@ class Client {
 
 	private $followRedirects = true;
 	private $maxTries = 3;
+	private $connectTimeout = 5;
+	private $timeout = 5;
 
 	public function __construct($url = NULL, $method = 'GET', array $options = array()) {
 		if (! is_null($url)) {
@@ -106,6 +108,26 @@ class Client {
 		return $this;
 	}
 
+	public function getConnectTimeout() {
+		return $this->connectTimeout;
+	}
+
+	public function setConnectTimeout($connectTimeout) {
+		$this->connectTimeout = (int)$connectTimeout;
+
+		return $this;
+	}
+
+	public function getTimeout() {
+		return $this->timeout;
+	}
+
+	public function setTimeout($timeout) {
+		$this->timeout = (int)$timeout;
+
+		return $this;
+	}
+
 	public function send($request = NULL) {
 		if (! is_null($request) && $request instanceof \Psr\Http\Message\RequestInterface)
 			$this->request = $request;
@@ -145,6 +167,9 @@ class Client {
 
 		curl_setopt($ch, CURLOPT_HEADER, 1);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectTimeout);
+		curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
 
 		$ret = curl_exec($ch);
 		$this->parseOutput($ch, $ret);
