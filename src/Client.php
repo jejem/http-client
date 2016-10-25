@@ -22,6 +22,8 @@ class Client {
 	private $connectTimeout = 5;
 	private $timeout = 5;
 
+	private $headersSize = 0;
+
 	public function __construct($url = NULL, $method = 'GET', array $options = array()) {
 		if (! is_null($url)) {
 			$uri = new Uri($url);
@@ -171,12 +173,16 @@ class Client {
 		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectTimeout);
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
 
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($ch, $h) { $this->headersSize += strlen($h); return strlen($h); });
+
+		$this->headersSize = 0;
 		$ret = curl_exec($ch);
 		$this->parseOutput($ch, $ret);
 
 		$i = 1;
 		while ((curl_errno($ch) == CURLE_COULDNT_CONNECT || curl_errno($ch) == CURLE_RECV_ERROR || curl_errno($ch) == CURLE_OPERATION_TIMEOUTED || curl_errno($ch) == CURLE_GOT_NOTHING) && $i < $this->maxTries) {
 			usleep(rand(1000000, 3000000));
+			$this->headersSize = 0;
 			$ret = curl_exec($ch);
 			$this->parseOutput($ch, $ret);
 			$i++;
@@ -242,10 +248,7 @@ class Client {
 		if (! is_resource($ch) || ! $ret)
 			return false;
 
-		if (array_key_exists(CURLOPT_PROXY, $this->options) && version_compare(curl_version()['version'], '7.30.0', '<'))
-			list($headers, $ret) = preg_split('/\r\n\r\n|\r\r|\n\n/', $ret, 2);
-
-		$headers_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$headers_size = $this->headersSize;
 		if (is_numeric($headers_size) && $headers_size > 0) {
 			$headers = trim(substr($ret, 0, $headers_size));
 			$body = substr($ret, $headers_size);
