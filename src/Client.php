@@ -43,6 +43,18 @@ class Client {
 			}
 		}
 
+		if (array_key_exists(CURLOPT_FOLLOWLOCATION, $options)) {
+			$this->setFollowRedirects($options[CURLOPT_FOLLOWLOCATION]);
+		}
+
+		if (array_key_exists(CURLOPT_CONNECTTIMEOUT, $options)) {
+			$this->setConnectTimeout($options[CURLOPT_CONNECTTIMEOUT]);
+		}
+
+		if (array_key_exists(CURLOPT_TIMEOUT, $options)) {
+			$this->setTimeout($options[CURLOPT_TIMEOUT]);
+		}
+
 		$this->options = $options;
 	}
 
@@ -141,6 +153,7 @@ class Client {
 		curl_setopt_array($ch, $this->options);
 
 		curl_setopt($ch, CURLOPT_URL, (string)$this->request->getUri());
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
 
 		$headers = array();
 		foreach ($this->request->getHeaders() as $k => $v)
@@ -191,7 +204,7 @@ class Client {
 		$this->errno = curl_errno($ch);
 		$this->error = curl_error($ch);
 
-		if (! is_null($this->response) && substr($this->response->getStatusCode(), 0, 1) == 3 && $this->followRedirects) {
+		if (! is_null($this->response) && substr($this->response->getStatusCode(), 0, 1) == 3 && $this->getFollowRedirects()) {
 			$this->setUri(new Uri(curl_getinfo($ch, CURLINFO_REDIRECT_URL)));
 			return $this->send();
 		}
