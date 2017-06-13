@@ -143,7 +143,7 @@ class Client {
 	}
 
 	public function send($request = NULL) {
-		if (! is_null($request) && $request instanceof \Psr\Http\Message\RequestInterface)
+		if (is_object($request) && $request instanceof \Psr\Http\Message\RequestInterface)
 			$this->request = $request;
 
 		if (! is_object($this->request) || ! $this->request instanceof \Psr\Http\Message\RequestInterface)
