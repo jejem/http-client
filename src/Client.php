@@ -146,6 +146,9 @@ class Client {
 		if (! is_null($request) && $request instanceof \Psr\Http\Message\RequestInterface)
 			$this->request = $request;
 
+		if (! is_object($this->request) || ! $this->request instanceof \Psr\Http\Message\RequestInterface)
+			throw new ClientException('No valid Request to execute', 255);
+
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_ENCODING, '');
