@@ -260,8 +260,19 @@ class Client {
 	}
 
 	private function parseOutput($ch, $ret) {
-		if (! is_resource($ch) || ! $ret)
+		if (! $ret) {
 			return false;
+		}
+
+		if (\PHP_VERSION_ID < 80000) {
+			if (! is_resource($ch)) {
+				return false;
+			}
+		} else {
+			if (! $ch instanceof \CurlHandle) {
+				return false;
+			}
+		}
 
 		$headers_size = $this->headersSize;
 		if (is_numeric($headers_size) && $headers_size > 0) {
